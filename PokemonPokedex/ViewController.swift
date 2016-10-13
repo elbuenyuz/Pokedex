@@ -8,6 +8,7 @@
 
 import UIKit
 import AVFoundation
+import Firebase
 
 class ViewController: UIViewController,UICollectionViewDelegate,UICollectionViewDataSource,UICollectionViewDelegateFlowLayout,UISearchBarDelegate {
     
@@ -17,17 +18,34 @@ class ViewController: UIViewController,UICollectionViewDelegate,UICollectionView
     var pokemon : Pokemon!
     var musicPlayer : AVAudioPlayer!
     
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         collection.delegate = self
         collection.dataSource = self
         
+        //hacemos referencia a la base de datos
+        let ref = FIRDatabase.database().reference()
+        
+        //ponemos un observador que nos imprimira lo que tengamos en la DB
+        ref.observe(.childAdded,with: { (snapshot) in
+            
+            print("this is what is in the Database \(snapshot)")
+            
+        })
+        
+        //anadmios un newchild y automaticamente un setKey
+        ref.child("setKeyValues").childByAutoId().setValue("this is the value")
+        
+        //nuevo child vvalue sin key automatica
+        ref.child("newVa").setValue("yaaas")
+        
         pokemon = Pokemon(pokemonName: "daniel", pokemonId: 10)
         initMusic()
     }
 
-    
+//func to start music
     func initMusic(){
         
         let path = Bundle.main.path(forResource: "music", ofType: "mp3")!
